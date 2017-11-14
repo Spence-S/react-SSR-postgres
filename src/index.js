@@ -9,6 +9,11 @@ import proxy from 'express-http-proxy';
 import sequelize from './db';
 import Users from './api/models/Users';
 import chalk from 'chalk';
+import session from 'express-session';
+import passport from './config/passport';
+import bodyParser from 'body-parser';
+import cookieParser from 'cookie-parser';
+import users from './api/routes/users';
 
 const app = express();
 
@@ -23,6 +28,21 @@ sequelize
 
 app.use(logger('dev'));
 app.use(express.static('public'));
+app.use(express.static('public'));
+app.use(bodyParser.urlencoded({ extended: false }));
+app.use(bodyParser.json());
+app.use(cookieParser());
+app.use(
+  session({
+    secret: 'cats',
+    resave: false,
+    saveUninitialized: false
+  })
+);
+app.use(passport.initialize());
+app.use(passport.session());
+
+app.use('/api', users);
 
 app.get('*', async (req, res) => {
   const Store = createStore();
@@ -31,6 +51,11 @@ app.get('*', async (req, res) => {
   );
   await Promise.all(promises);
   res.send(render(req, Store));
+});
+
+app.use(function(err, req, res, next) {
+  console.error(err.stack);
+  res.status(500).send('Something broke!');
 });
 
 app.listen(3000, () => {
