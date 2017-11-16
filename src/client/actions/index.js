@@ -8,3 +8,12 @@ export const fetchUsers = () => async dispatch => {
     payload: res
   });
 };
+
+const LOGIN_USER = 'login_user';
+export const loginUser = (email, password) => async dispatch => {
+  const res = await axios.post('/api', {
+    email,
+    password
+  });
+  console.log(res);
+};
