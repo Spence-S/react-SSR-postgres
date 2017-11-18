@@ -9,8 +9,15 @@ import { Provider } from 'react-redux';
 import Routes from './Routes';
 import State from './reducers';
 import { renderRoutes } from 'react-router-config';
+import logger from 'redux-logger';
 
-const Store = createStore(State, window.__initialState, applyMiddleware(thunk));
+const Store = createStore(
+  State,
+  window.__initialState,
+  applyMiddleware(thunk, logger)
+);
+
+window.Store = Store; // just for dev
 
 ReactDOM.hydrate(
   <Provider store={Store}>

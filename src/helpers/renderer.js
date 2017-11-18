@@ -7,10 +7,10 @@ import { renderRoutes } from 'react-router-config';
 // protect against xss attacks
 import serialize from 'serialize-javascript';
 
-export default (req, Store) => {
+export default (req, Store, context) => {
   const content = renderToString(
     <Provider store={Store}>
-      <StaticRouter location={req.path} context={{}}>
+      <StaticRouter location={req.path} context={context}>
         <div>{renderRoutes(Routes)}</div>
       </StaticRouter>
     </Provider>

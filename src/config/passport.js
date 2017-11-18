@@ -34,4 +34,10 @@ passport.deserializeUser(async (id, done) => {
   }
 });
 
+const isLoggedIn = (req, res, next) => {
+  if (req.isAuthenticated()) return next();
+  res.send('You need to be logged in for that!');
+};
+
+export { isLoggedIn };
 export default passport;

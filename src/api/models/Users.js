@@ -1,9 +1,14 @@
 import sequelize, { db } from '../../db';
 import uuidv4 from 'uuid/v4';
 import bcrypt from 'bcryptjs';
+import chalk from 'chalk';
 
 const User = sequelize.define('user', {
-  id: { primaryKey: true, type: db.UUID, defaultValue: db.UUIDV4 },
+  id: {
+    primaryKey: true,
+    type: db.UUID,
+    defaultValue: db.UUIDV4
+  },
   firstName: {
     type: db.STRING
   },
@@ -12,7 +17,8 @@ const User = sequelize.define('user', {
   },
   email: {
     type: db.STRING,
-    isEmail: true
+    isEmail: true,
+    unique: true
   },
   password: {
     type: db.STRING
@@ -22,8 +28,18 @@ const User = sequelize.define('user', {
   }
 });
 
-// sequelize hooks should return promises for async actions
-// http://docs.sequelizejs.com/manual/tutorial/hooks.html#declaring-hooks
+/**
+ * remove password and salt from responses
+ */
+User.prototype.toJSON = function() {
+  const { password, salt, ...rest } = this.get();
+  return rest;
+};
+
+/**
+ * sequelize hooks should return promises for async actions
+ * http://docs.sequelizejs.com/manual/tutorial/hooks.html#declaring-hooks
+ */
 User.beforeCreate((user, options) => {
   return new Promise((resolve, reject) => {
     bcrypt.genSalt(12, function(err, salt) {
@@ -37,6 +53,9 @@ User.beforeCreate((user, options) => {
   });
 });
 
+/**
+ * @param {string} pw - password to compare to password hash in db
+ */
 User.prototype.isValidPw = function(pw) {
   return new Promise((resolve, reject) => {
     bcrypt.compare(pw, this.password, function(err, res) {
@@ -47,7 +66,7 @@ User.prototype.isValidPw = function(pw) {
 
 User.sync({ force: true })
   .then(() => {
-    console.log('added that bum jogn');
+    console.log(chalk.blue("\nUser's table has synced successfully"));
     User.create({
       firstName: 'John',
       lastName: 'Hancock',
@@ -58,6 +77,6 @@ User.sync({ force: true })
       password: 'password'
     });
   })
-  .catch(err => console.log(err));
+  .catch(err => console.log(chalk.red(err)));
 
 export default User;

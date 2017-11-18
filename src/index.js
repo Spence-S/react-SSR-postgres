@@ -6,8 +6,6 @@ import { matchRoutes } from 'react-router-config';
 import Routes from './client/Routes';
 import logger from 'morgan';
 import proxy from 'express-http-proxy';
-import sequelize from './db';
-import Users from './api/models/Users';
 import chalk from 'chalk';
 import session from 'express-session';
 import passport from './config/passport';
@@ -16,15 +14,6 @@ import cookieParser from 'cookie-parser';
 import users from './api/routes/users';
 
 const app = express();
-
-sequelize
-  .authenticate({
-    logging: false // don't log query
-  })
-  .then(() =>
-    console.log(chalk.blueBright('Connection to DB established successssss'))
-  )
-  .catch(err => console.error('No DB connections', err));
 
 app.use(logger('dev'));
 app.use(express.static('public'));
@@ -49,8 +38,20 @@ app.get('*', async (req, res) => {
   const promises = matchRoutes(Routes, req.path).map(
     ({ route }) => (route.loadData ? route.loadData(Store) : null)
   );
-  await Promise.all(promises);
-  res.send(render(req, Store));
+  const renderer = () => {
+    const context = {};
+    const content = render(req, Store, context);
+    if (context.notFound) {
+      res.status(404);
+    }
+    res.send(content);
+  };
+  try {
+    await Promise.all(promises);
+    renderer();
+  } catch (err) {
+    renderer();
+  }
 });
 
 app.use(function(err, req, res, next) {

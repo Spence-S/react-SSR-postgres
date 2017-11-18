@@ -1,15 +1,18 @@
 import React, { Component } from 'react';
 import { connect } from 'react-redux';
 import { loginUser } from '../actions';
+import axios from 'axios';
 
 class Home extends Component {
   constructor(props) {
     super(props);
     this.state = {
       loginVal: '',
-      passowordVal: ''
+      passwordVal: ''
     };
     this.handleInputChange = this.handleInputChange.bind(this);
+    this.handleSubmit = this.handleSubmit.bind(this);
+    this.getPrivateData = this.getPrivateData.bind(this);
   }
 
   handleInputChange(event) {
@@ -19,13 +22,18 @@ class Home extends Component {
     this.setState({
       [name]: value
     });
-    console.log(this.state.loginVal);
+    console.log(this.state);
   }
 
   handleSubmit(e) {
     e.preventDefault();
-    console.log('Form was submitted man!');
+    console.log(this.state);
     this.props.loginUser(this.state.loginVal, this.state.passwordVal);
+  }
+
+  async getPrivateData() {
+    const res = await axios.get('/api/private');
+    console.log(res);
   }
 
   render() {
@@ -38,13 +46,17 @@ class Home extends Component {
             value={this.state.loginVal}
             onChange={this.handleInputChange}
           />
-          <label>Password:</label>
+          <label>Password</label>
           <input
             name="passwordVal"
             value={this.state.passwordVal}
             onChange={this.handleInputChange}
           />
+          <button type="submit">Submit</button>
         </form>
+        <div>
+          <button onClick={this.getPrivateData}>Get Private Data!</button>
+        </div>
       </div>
     );
   }

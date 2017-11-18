@@ -1,5 +1,5 @@
 import express from 'express';
-import passport from '../../config/passport';
+import passport, { isLoggedIn } from '../../config/passport';
 import Users from '../models/Users';
 
 const router = express.Router();
@@ -9,12 +9,21 @@ router.get('/', (req, res) => {
   res.send('sup ninja');
 });
 
-router.get('/private', passport.authenticate('local'), (req, res) => {
-  res.send('private message');
+router.get('/current_user', isLoggedIn, (req, res) => {
+  res.send(req.user);
 });
 
-router.post('/', passport.authenticate('local'), (req, res) => {
+router.get('/private_data', isLoggedIn, (req, res) => {
+  res.send('this be the private data!');
+});
+
+router.post('/login', passport.authenticate('local'), (req, res) => {
   res.send(req.user);
+});
+
+router.get('/logout', (req, res) => {
+  req.logout();
+  res.redirect('/');
 });
 
 router.post('/signup', async (req, res) => {
@@ -22,6 +31,7 @@ router.post('/signup', async (req, res) => {
     email: req.body.email,
     password: req.body.password
   });
+  req.login(user);
   res.send(user);
 });
 
