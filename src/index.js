@@ -6,30 +6,8 @@ import { matchRoutes } from 'react-router-config';
 import Routes from './client/Routes';
 import logger from 'morgan';
 import proxy from 'express-http-proxy';
-import chalk from 'chalk';
-import session from 'express-session';
-import passport from './config/passport';
-import bodyParser from 'body-parser';
-import cookieParser from 'cookie-parser';
-import users from './api/routes/users';
 
 const app = express();
-
-app.use(logger('dev'));
-app.use(express.static('public'));
-app.use(express.static('public'));
-app.use(bodyParser.urlencoded({ extended: false }));
-app.use(bodyParser.json());
-app.use(cookieParser());
-app.use(
-  session({
-    secret: 'cats',
-    resave: false,
-    saveUninitialized: false
-  })
-);
-app.use(passport.initialize());
-app.use(passport.session());
 
 app.use('/api', users);
 

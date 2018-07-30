@@ -23,6 +23,9 @@ export const loginUser = (email, password) => async dispatch => {
 
 export const FETCH_CURRENT_USER = 'fetch_current_user';
 export const fetchCurrentUser = fromServer => async (dispatch, getState) => {
+  if (fromServer) {
+    return dispatch({});
+  }
   try {
     console.log('\ndid I get called on the server -- and did I work? da fuq');
     const res = await axios.get('/api/current_user');

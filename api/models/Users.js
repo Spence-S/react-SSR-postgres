@@ -1,4 +1,4 @@
-import sequelize, { db } from '../../db';
+import sequelize, { db } from '../db';
 import uuidv4 from 'uuid/v4';
 import bcrypt from 'bcryptjs';
 import chalk from 'chalk';
